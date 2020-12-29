@@ -6,8 +6,11 @@ library(forecast)
 library(strucchange)
 library(trend)
 
+## load workspace
+load("workspace_data_functions.RData")
+
 # the data
-y<-RH1 # RH1,RH2,RH3,RH4,NRH1,NRH2,NRH3,Hotel
+y<-RH1 #RH2,RH3,RH4,NRH1,NRH2,NRH3,Hotel
 # specify the frequency  12 months
 s<-12
 # length y
