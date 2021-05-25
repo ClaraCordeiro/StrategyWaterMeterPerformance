@@ -60,7 +60,7 @@ rob.y<-test.Outliers.STL(y) # check outliers
 fit.y<-stl.fit(y,rob.y,k)  # stl.fit function
 ```
 
-<img src="OutroReadme_files/figure-gfm/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+<img src="Readme_files/figure-gfm/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
 #### Step 2 - Detecting *breakpoints* (bp)
 
@@ -71,7 +71,7 @@ max.break<-ceiling(0.5/min.h) # min h (Eq. 4)
 bpy<-breakpoints(ystar~1,h = min.h,breaks=max.break) # breakpoints() from package strucchange
 ```
 
-<img src="OutroReadme_files/figure-gfm/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="Readme_files/figure-gfm/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 #### Step 3 - Detecting *relevant breakpoints* (bp\*)
 
@@ -79,7 +79,7 @@ bpy<-breakpoints(ystar~1,h = min.h,breaks=max.break) # breakpoints() from packag
 bpy.star<-s.bp(ystar,bpy$breakpoints,al)
 ```
 
-<img src="OutroReadme_files/figure-gfm/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+<img src="Readme_files/figure-gfm/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
 
 #### Step 4 - Determining *Relative Magnitude of Change* (RMC)
 
