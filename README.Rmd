@@ -1,0 +1,223 @@
+---
+title: "Strategy Water Meter Performance"
+output: github_document
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo=FALSE,message = FALSE,warning = FALSE, fig.align="center")
+```
+
+
+
+```{r, echo=FALSE}
+library(forecast)
+library(strucchange)
+library(trend)
+library(ggplot2)
+```
+
+
+
+```{r, echo=FALSE}
+load("~/GitHub/StrategyWaterMeterPerformance/workspace_data_functions.RData")
+```
+
+## Overview
+
+Functions, datasets and script used in the paper *A strategy to assess water meter performance* by Clara Cordeiro, Ana Borges and M. Rosario Ramos, in *Journal of Water Resources Planning and Management*, 2021. Status: *under revision*.
+
+### Install packages
+
+```R
+install.packages("forecast",dependencies = TRUE)
+install.packages("strucchange",dependencies = TRUE)
+install.packages("trend",dependencies = TRUE)
+```
+
+### Usage 
+
+```R
+library(forecast)  # version 8.14
+library(strucchange) # 1.5-2
+library(trend) # 1.1.4
+load("workspace_data_functions.RData")
+```
+which includes the functions:
+
+- **test.Outliers.STL**: boolean output, *True* in case of outliers
+
+- **T.dec**: boolean output, *True* in case of a decreasing trend using Mann-Kendall test
+
+- **s.bp**: find the relevant breakpoints
+
+- **RelMChange**: calculate the RMC (Eq. 5)
+
+
+### Example
+
+#### Initial settings
+
+```R
+y<-RH2  # Residential household 2 (RH2)
+```
+
+```{r fig.height=3,fig.width=6}
+autoplot(RH2)+
+  geom_line(na.rm=TRUE,color="darkorange",size=1)+
+  geom_point()+
+  #ylim(0,20)+
+  theme_classic()+
+  ggtitle("RH2") +
+  xlab(" ") + ylab(expression(m^3))
+
+```
+```R
+al<-0.05  # level of significance
+s<-12   # define frequency or just use s<-frequency(y)
+n.y<-length(y)  # time series length
+k<-3  # the error measure considered, in this case is Mean Absolute Error (MAE). However, it can be set as Mean Error (ME) (k<-1), or Root Mean Square Error (RMSE) (k<-2), see function accuracy() at package forecast for more information about it
+```
+
+#### Step 1 - Seasonal-trend decomposition based on Loess
+
+```R
+rob.y<-test.Outliers.STL(y) # check outliers
+fit.y<-stl.fit(y,rob.y,k)  # stl.fit function
+```
+
+```{r fig.height=4,fig.width=6}
+autoplot(fit.y$stlfit,range.bars=FALSE) +
+  geom_line(na.rm=TRUE,color="darkorange",size=1)+
+  theme_bw(base_size = 8)+
+  ggtitle("RH2") +
+  xlab(" ") +theme(title = element_text(size = 11))
+```
+
+#### Step 2 - Detecting *breakpoints* (bp)
+
+```R
+ystar<-y-fit.y$stlfit$time.series[,"seasonal"] # seasonally adjusted (y*)  (Eq.2)
+min.h<-round(s/n.y,2) # max breaks (Eq. 3)
+max.break<-ceiling(0.5/min.h) # min h (Eq. 4)
+bpy<-breakpoints(ystar~1,h = min.h,breaks=max.break) # breakpoints() from package strucchange
+```
+
+```{r fig.height=3,fig.width=6}
+p<-autoplot(ystar)+
+  geom_line(na.rm=TRUE,color="darkorange",size=1)+
+  theme_classic()+
+  ylim(0,20)+
+  xlab(" ") + ylab(expression(m^3))+
+  ggtitle("RH2")
+
+my.bp1<- breakdates(bpy)
+p11<-p  + geom_vline(xintercept = my.bp1, size=1,col="grey", linetype = "dashed")
+my.bp2 <- index(ystar)[bpy.star]
+p2<-p11  + geom_vline(xintercept = my.bp2, size=1,col="grey", linetype = "dashed")
+p2
+```
+
+
+#### Step 3 - Detecting *relevant breakpoints* (bp*)
+
+```R
+bpy.star<-s.bp(ystar,bpy$breakpoints,al)
+```
+```{r fig.height=3,fig.width=6}
+p<-autoplot(ystar)+
+  geom_line(na.rm=TRUE,color="darkorange",size=1)+
+  theme_classic()+
+  ylim(0,20)+
+  xlab(" ") + ylab(expression(m^3))+
+  ggtitle("RH2")
+
+my.bp1<- breakdates(bpy)
+p11<-p  + geom_vline(xintercept = my.bp1, size=1,col="grey", linetype = "dashed")
+my.bp2 <- index(ystar)[bpy.star]
+p2<-p11  + geom_vline(xintercept = my.bp2, size=1,col="blue", linetype = "dashed")
+p2
+```
+
+#### Step 4 - Determining *Relative Magnitude of Change* (RMC) 
+
+If bp*=NULL then stop otherwise do the following
+
+```R
+rmc<-RelMChange(ystar,bpy$breakpoints,bpy.star) (Eq. 5)
+```
+
+## Results 
+Table 1 and table 2, separated by double **|  |**. See *script_tables.R*.
+
+```{r, echo=FALSE}
+  
+  aux<-bpy$breakpoints
+  
+  # compute breakpoint dates
+  barray = c()
+  for(a in aux){
+    barray <- append(barray, paste0(floor(time(y)[a]),'(',month.abb[round(((time(y)[a] %% 1)*12) + 1)],')'))
+    }
+  
+  # add beginning and end indices so we can loop over segments
+  aux = c(1, aux, n.y)
+  
+  # save the breakdates to the output string
+  output <- paste0(barray, collapse=',') 
+  output <- paste0(output, ' |')
+  
+  output.seg<-NULL
+  # loop over each segment and save the results to the output string
+  for(ai in 1:(length(aux)-1)){
+    
+    seg<-trend::sens.slope(ystar[aux[ai]:aux[ai+1]])
+    
+    # append the segment data
+    output.seg<-paste(output.seg,'Segment', ai ,' |')
+    output<-paste(output, 
+                   paste0(round(seg[["estimates"]][["Sen's slope"]], 2), '(',round(seg[["p.value"]], 5),')', ' |'))
+    }
+  
+ ### table 2 (append to table 1)
+  
+  # step3: select bp*
+  bpy.star<-s.bp(ystar,bpy$breakpoints,al)
+  
+  
+  if(is.null(bpy.star)) {
+    output2<-paste("No relevant breakpoints", ' |')
+} else {
+  aux2<-bpy.star
+  
+  # compute breakpoint dates
+  barray = c()
+  for(a in aux2){
+    barray <- append(barray, paste0(floor(time(y)[a]),'(', month.abb[round(((time(y)[a] %% 1)*12) + 1)], ')'))
+    }
+  
+  # save the breakdates to the output string
+  output2 <- paste0(barray, collapse=',') 
+
+  # step4: calculate RMC  Eq. (5)
+  # if bp* NULL then stop otherwise do the following
+  ## magnitude
+  
+  rmc<-RelMChange(ystar,bpy$breakpoints,bpy.star)
+  
+  output.rmc<-c()
+  for(ai in 1:length(rmc)){
+    output.rmc<-paste(output.rmc, 
+                  paste0(round(rmc[ai], 2), ' |'))
+  }
+  output2<-paste(output2, ' |', output.rmc)
+  }
+  
+  
+print(paste('Type | Breakpoints |',output.seg, '| Relevant bp* | RMC '))
+  
+print(paste('Rh2 |', output, ' | ', output2))
+```
+
+
+## Note
+Contributions, issues, and feature requests are welcome!
