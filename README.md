@@ -1,4 +1,4 @@
-Strategy Water Meter Performance
+A strategy to assess water meter performance
 ================
 
 ## Overview
@@ -19,13 +19,13 @@ install.packages("trend",dependencies = TRUE)
 ### Usage
 
 ``` r
-library(forecast)  # version 8.14
-library(strucchange) # 1.5-2
-library(trend) # 1.1.4
+library(forecast)  
+library(strucchange) 
+library(trend) 
 load("workspace_data_functions.RData")
 ```
 
-which includes the functions:
+### Functions implemented
 
 -   **test.Outliers.STL**: *True* in case of outliers, otherwise *FALSE*
 

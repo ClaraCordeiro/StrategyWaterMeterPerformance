@@ -1,5 +1,5 @@
 ---
-title: "Strategy Water Meter Performance"
+title: "A strategy to assess water meter performance"
 output: github_document
 ---
 
@@ -37,12 +37,13 @@ install.packages("trend",dependencies = TRUE)
 ### Usage 
 
 ```R
-library(forecast)  # version 8.14
-library(strucchange) # 1.5-2
-library(trend) # 1.1.4
+library(forecast)  
+library(strucchange) 
+library(trend) 
 load("workspace_data_functions.RData")
 ```
-which includes the functions:
+
+### Functions implemented 
 
 - **test.Outliers.STL**: *True* in case of outliers, otherwise *FALSE*
 
