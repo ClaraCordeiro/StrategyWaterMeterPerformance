@@ -48,9 +48,9 @@ y<-RH2
 
 ``` r
 al<-0.05  # level of significance
-s<-12   # define frequency
-n.y<-length(y)  # time series length
-k<-3  # its refers to the error measure used, in this case is Mean Absolute Error (MAE). However, it can be k<-1 for Mean Error (ME), k<-2 for Root Mean Square Error (RMSE), among others... see accuracy() function from package forecast for more information about it.
+s<-12   # monthly
+n.y<-length(y)  
+k<-3  # Mean Absolute Error, but it can be the Mean Error (k<-1), Root Mean Square Error (k<-2); see accuracy() from package forecast for more information about it.
 ```
 
 #### Step 1 - Seasonal-trend decomposition based on Loess
@@ -83,22 +83,23 @@ bpy.star<-s.bp(ystar,bpy$breakpoints,al)
 
 #### Step 4 - Determining *Relative Magnitude of Change* (RMC)
 
-If bp\*=NULL then stop otherwise do the following
+If bp\*=NULL then **stop** otherwise calculate
 
 ``` r
 rmc<-RelMChange(ystar,bpy$breakpoints,bpy.star) (Eq. 5)
 ```
 
-## Results
+#### Results
 
-Table 1 and table 2, separated by double **\| \|**. See
-*script\_tables.R*.
+Table 1 and table 2, separated by double **\| \|**.
 
     ## [1] "Type | Breakpoints |  Segment 1  | Segment 2  | Segment 3  | | Relevant bp* | RMC "
 
     ## [1] "Rh2 | 2012(Apr),2015(Dec) | 0.01(0.89256) | -0.02(0.39474) | -0.26(2e-04) |  |  2015(Dec)  |  -12 |"
 
-#### About software used
+Run *script\_run\_data.R* for all data in the paper.
+
+### About software used
 
 -   **R** version 4.1.0
 -   package **trend** version 1.1.4
