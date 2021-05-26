@@ -27,30 +27,30 @@ load("workspace_data_functions.RData")
 
 which includes the functions:
 
--   **test.Outliers.STL**: boolean output, *True* in case of outliers
+-   **test.Outliers.STL**: *True* in case of outliers, otherwise *FALSE*
 
--   **T.dec**: boolean output, *True* in case of a decreasing trend
-    using Mann-Kendall test
+-   **T.dec**: *True* in case of a decreasing trend using Mann-Kendall
+    test, otherwise *FALSE*
 
 -   **s.bp**: find the relevant breakpoints
 
 -   **RelMChange**: calculate the RMC (Eq. 5)
 
-### Example
-
-#### Initial settings
+### Example - Residential household 2 (RH2)
 
 ``` r
-y<-RH2  # Residential household 2 (RH2)
+y<-RH2
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
+#### Initial settings
+
 ``` r
 al<-0.05  # level of significance
-s<-12   # define frequency or just use s<-frequency(y)
+s<-12   # define frequency
 n.y<-length(y)  # time series length
-k<-3  # the error measure considered, in this case is Mean Absolute Error (MAE). However, it can be set as Mean Error (ME) (k<-1), or Root Mean Square Error (RMSE) (k<-2), see function accuracy() at package forecast for more information about it
+k<-3  # its refers to the error measure used, in this case is Mean Absolute Error (MAE). However, it can be k<-1 for Mean Error (ME), k<-2 for Root Mean Square Error (RMSE), among others... see accuracy() function from package forecast for more information about it.
 ```
 
 #### Step 1 - Seasonal-trend decomposition based on Loess
@@ -73,7 +73,7 @@ bpy<-breakpoints(ystar~1,h = min.h,breaks=max.break) # breakpoints() from packag
 
 <img src="README_files/figure-gfm/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
-#### Step 3 - Detecting *relevant breakpoints* (bp\*)
+#### Step 3 - Detecting *relevant breakpoints* (bp\*, blue dashed vertical line below)
 
 ``` r
 bpy.star<-s.bp(ystar,bpy$breakpoints,al)
@@ -98,6 +98,11 @@ Table 1 and table 2, separated by double **\| \|**. See
 
     ## [1] "Rh2 | 2012(Apr),2015(Dec) | 0.01(0.89256) | -0.02(0.39474) | -0.26(2e-04) |  |  2015(Dec)  |  -12 |"
 
-## Note
+#### About software used
 
-Contributions, issues, and feature requests are welcome!
+-   **R** version 4.1.0
+-   package **trend** version 1.1.4
+-   package **forecast** version 8.14
+-   package **strucchange** version 1.5-2
+
+#### *Contributions, issues, and feature requests are welcome!*
