@@ -27,9 +27,9 @@ load("workspace_data_functions.RData")
 
 ### Functions implemented
 
--   **test.Outliers.STL**: *True* in case of outliers, otherwise *FALSE*
+-   **test.Outliers.STL**: *TRUE* in case of outliers, otherwise *FALSE*
 
--   **T.dec**: *True* in case of a decreasing trend using Mann-Kendall
+-   **T.dec**: *TRUE* in case of a decreasing trend using Mann-Kendall
     test, otherwise *FALSE*
 
 -   **s.bp**: find the relevant breakpoints
