@@ -5,8 +5,7 @@ A strategy to assess water meter performance
 
 Functions, datasets and script used in the paper *A strategy to assess
 water meter performance* by Clara Cordeiro, Ana Borges and M. Rosario
-Ramos, in *Journal of Water Resources Planning and Management*, 2021.
-Status: *under revision*.
+Ramos, in *Journal of Water Resources Planning and Management*, 2022. DOI:10.1061/(ASCE)WR.1943-5452.0001492
 
 ### Install packages
 
